@@ -90,7 +90,5 @@ Now we've reached the first checkpoint. We will be releasing many more additions
 to this tutorial over time, but you've already done so much. You've designed an 
 app using the MVC model that has multiple views, cool animations, and even syncs
 with iCloud! You've also written custom classes, made asyncronous requests, and 
-worked with the Core Location API. Check out what's forthcoming for you to see
-that we're just at the tip of the iceberg: 
+worked with the Core Location API. We're barely at the tip of the iceberg! 
 
-**** iceberg image ****
