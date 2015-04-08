@@ -1,7 +1,7 @@
 {
   "title": "Build a Deployment-ready iOS App In Swift",
   "description": "Forget your the To-do app tutorials and 'Hello Worlds,' build a fully-featured app that is app-store ready using Swift. This app includes iCloud, encryption, graphing, and location functionality. ",
-  "url": "https://thinkster.io/swift-ios-app/",
+  "url": "swift-ios-app",
   "git": "https://github.com/SwiftCast/Flourish-Tutorial-Thinkster",
   "coverImage": "images/swift.jpg",
   "author": {
