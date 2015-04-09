@@ -6,5 +6,5 @@ Flourish: An end-to-end tutorial for creating a journal app in Swift
 
 Welcome to the "Flourish" Github repository. This tutorial is hosted by Thinkster at https://thinkster.io/swift-ios-app/. 
 
-We'd like to make this a community maintained resource so if you have any imporvements or fixes, feel free to open a pull request!
+We'd like to make this a community maintained resource so if you have any improvements or fixes, feel free to open a pull request!
 
