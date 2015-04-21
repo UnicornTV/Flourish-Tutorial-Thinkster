@@ -357,10 +357,6 @@ Here's what our view should look like now.
 Now we need to add a divider that is going to separate our date field from the 
 other input objects in that app. 
 
-{x: rename_divider}
-Change the view's label property in the document section of the identity inspector
-to "Divider."
-
 {x: add_divider}
 Drag an view from the object library and drop it onto our view. Set a
 height constraint of 1 point. 
@@ -368,6 +364,9 @@ height constraint of 1 point.
 {x: divider_left_right}
 Set a leading and trailing margin constraint of 0 between our Divider and its
 containing view. 
+
+{x: rename_divider}
+Label the UIView as "Divider" by either selecting the view in the Document outline and hitting enter or changing it's label under Identity Inspector > Document > Label.
 
 So far we've established a relative width of our divider with leading and 
 trailing constraints. Now we need to give our divider a vertical position. 
