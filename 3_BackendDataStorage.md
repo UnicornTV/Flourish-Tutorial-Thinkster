@@ -48,7 +48,7 @@ account to associate with this app.
 
 {x: services_checkboxes}
 In the iCloud menu of the capabilities pane, check the CloudKit box in the services
-menu and make sure the key-vale storage box is also checked. 
+menu and make sure the key-val storage box is also checked. 
 
 {x: containers_checkboxes}
 Right below services is the containers menu. Select the "specify custom containers"
@@ -155,7 +155,6 @@ Add the following code to define a new class called Model.
   }
   
   var delegate: ModelDelegate?
-  let user: User
   let container: CKContainer
   let publicDB: CKDatabase
   let privateDB: CKDatabase
@@ -165,7 +164,6 @@ Add the following code to define a new class called Model.
     container = CKContainer.defaultContainer()
     publicDB = container.publicCloudDatabase
     privateDB = container.privateCloudDatabase
-    user = User(container: container)
   }
 }
 
@@ -176,10 +174,7 @@ In the first line, we've declared a class called Model. We use the @objc keyword
 to expose our swift class to our objective-c classes, in case we need to import 
 that class as an objective-c header file. Lines 8-12 create our properties 
 for our model class. The delegate property will refer to the class that conforms
-to our newly-defined ModelDelegate protocol. User will be assigned to the user
-data from our Users record type in our database. You might have noticed we have 
-declared our user constant's type as User and xcode is throwing an error. Don't 
-worry we will shortly define a User class.  Container, publicDB, and privateDB
+to our newly-defined ModelDelegate protocol.  Container, publicDB, and privateDB
 are basically name spaces for CloudKit methods and properties. 
 
 In our initializer method, init(), we assign values to our non-optional properties.
@@ -189,11 +184,9 @@ object contains both private and public data as properties, so we'll assign our
 publicDB and privateDB constants to the public and private data properties of our
 container object. Notice how our class properties map well to the CloudKit dashboard. 
 
-To finalize our init() method we assign the user constant to an instance of the 
-user class and sets its container property to our container constant. Next we 
-want to implement a singleton pattern for our class. Singleton patterns are common
-in iOS and basically boil down to ensuring that every time you implement a class, 
-you are referring to the exact same instance of that class rather than creating 
+Next we want to implement a singleton pattern for our class. Singleton patterns are 
+common in iOS and basically boil down to ensuring that every time you implement a 
+class, you are referring to the exact same instance of that class rather than creating 
 a new one. To do that, we assign a constant to an instance of our Model class. We
 ensure to define our constant outside of the class declaration. Then we create a
 type method that returns the same instance of the class every time its called. 
@@ -223,7 +216,7 @@ Create a new class called Entry with the following properties:
 class Entry: NSObject
 {
   let model: Model = Model.singleton()
-  let password: String!
+  let password: String
   var records = [Entry]()
   var record: CKRecord!
 }
@@ -231,7 +224,7 @@ class Entry: NSObject
 
 The first line assigns constant to the instance of our model class using the 
 singleton() method. The second line creates a constant of type String that will
-become a password to unlock our soon-to-be encrypted content. The records 
+become a password/key to unlock our soon-to-be encrypted content. The records 
 variable is an array of entries while the variable record is of type CKRecord.
 CKRecord is a CloudKit dictionary object with key-value pairs that we use to 
 fetch and save data.  
@@ -243,10 +236,9 @@ value of our properties.
 
 ~~~language-swift
 init(database: CKDatabase? = nil, record: CKRecord? = nil)
-  {
-    self.record = (record != nil) ? record! : CKRecord(recordType: "Entry")
-  }
-  
+{
+  self.record = (record != nil) ? record! : CKRecord(recordType: "Entry")
+}  
 ~~~
 
 Our initializer method is going to take a few optional properties as parameters. 
@@ -270,19 +262,19 @@ init function. Let's write ours:
 Write a convenience initializer method for our Entry class with the following code:
 
 ~~~language-swift
- convenience init(title: String, body: String, mood: Int, location: CLLocation?)
+convenience init(title: String, body: String, mood: Int, location: CLLocation?)
+{
+  self.init()
+  
+  self.title = title
+  self.body = body
+  self.mood = mood
+  
+  if let location = location
   {
-    self.init()
-    
-    self.title = title
-    self.body = body
-    self.mood = mood
-    
-    if let location = location
-    {
-      self.location = location
-    }
+    self.location = location
   }
+}
 ~~~
 
 In our convenience init we passing in title, body, mood, and location parameters and 
@@ -303,41 +295,41 @@ Let's get rid of those compiler warnings by defining title, body, mood, and loca
 properties. 
 
 ~~~language-swift
-  var title: String {
-    get {
-      return (self.record!.objectForKey("Title") as! String
-    }
-    set (val) {
-      record.setObject(val, forKey: "Title")
-    }
+var title: String {
+  get {
+    return (self.record!.objectForKey("Title") as! String
   }
-  
-  var body: String {
-    get {
-      return (self.record!.objectForKey("Body") as! String
-    }
-    set (val) {
-      record.setObject(val, forKey: "Body")
-    }
+  set (val) {
+    record.setObject(val, forKey: "Title")
   }
-  
-  var mood: Int! {
-    get {
-      return self.record!.objectForKey("Mood") as! Int
-    }
-    set (val) {
-      record.setObject(val, forKey: "Mood")
-    }
+}
+
+var body: String {
+  get {
+    return (self.record!.objectForKey("Body") as! String
   }
-  
-  var location: CLLocation {
-    get {
-      return self.record!.objectForKey("Location") as! CLLocation
-    }
-    set (val) {
-      record.setObject(val, forKey: "Location")
-    }
+  set (val) {
+    record.setObject(val, forKey: "Body")
   }
+}
+
+var mood: Int! {
+  get {
+    return self.record!.objectForKey("Mood") as! Int
+  }
+  set (val) {
+    record.setObject(val, forKey: "Mood")
+  }
+}
+
+var location: CLLocation {
+  get {
+    return self.record!.objectForKey("Location") as! CLLocation
+  }
+  set (val) {
+    record.setObject(val, forKey: "Location")
+  }
+}
 ~~~
 
 Since our data is modeled directly after the CKRecord schema, we want our properties
@@ -410,7 +402,7 @@ In our bridging header we need to import the Crypto.h header file to expose it
 to swift. Add the following to the Bridging-Header.h file:
 
 ~~~language-swift
- #import "Crypto.h"
+#import "Crypto.h"
 ~~~
 
 Now that we have our encryption library imported, we can start to use the it!
@@ -441,7 +433,7 @@ import UIKit
 
 final public class AuthHelper: NSObject
 {
-
+  // silence is golden
 }
 ~~~
 
@@ -458,25 +450,23 @@ NSObject.
 In our AuthHelper class, let's define a class variable named named "key" and assign it a value of "testkey"
 
 ~~~language-swift
-  class var key:String {return "testKey" }
+class var key:String {return "testKey" }
 ~~~
-
 
 {x: entry_method}
 Add an entry type method to our AuthHelper class with the following code:
 
 ~~~language-swift
-  public class func encrypt(input: String!, password: String? = nil) -> (string: String?, data: NSData?)
-  {
-    let data = input.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
-    let pass = (password != nil) ? password : self.password
-    let encryptedData = Encryptor.encryptData(data, password: pass, error: nil)
-    let encryptedString = encryptedData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0))
-    
-    return (string: encryptedString, data: encryptedData)
-  }
+public class func encrypt(input: String!, password: String? = nil) -> (string: String?, data: NSData?)
+{
+  let data = input.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+  let pass = (password != nil) ? password : self.password
+  let encryptedData = Encryptor.encryptData(data, password: pass, error: nil)
+  let encryptedString = encryptedData.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0))
+  
+  return (string: encryptedString, data: encryptedData)
+}
 ~~~
-
 
 Our encrypt type method takes a an input string to be encrypted and a password 
 string. It returns a tuple containing an encrypted string version of the data and
@@ -513,15 +503,15 @@ logic for this method is going the inverse logic we used to in our encrypt funct
 Add an decrypt type method to our AuthHelper class with the following code:
 
 ~~~language-swift
-  public class func decrypt(input: String!, password: String? = nil) -> (string: String?, data: NSData?)
-  {
-    let pass = (password != nil) ? password : self.password
-    let encryptedData = NSData(base64EncodedString: input, options: NSDataBase64DecodingOptions(rawValue: 0))
-    let decryptedData = Decryptor.decryptData(encryptedData, password: pass, error: nil)
-    let decryptedText = (NSString(data: decryptedData, encoding: NSUTF8StringEncoding) as? String)
-    
-    return (string: decryptedText, data: decryptedData)
-  }
+public class func decrypt(input: String!, password: String? = nil) -> (string: String?, data: NSData?)
+{
+  let pass = (password != nil) ? password : self.password
+  let encryptedData = NSData(base64EncodedString: input, options: NSDataBase64DecodingOptions(rawValue: 0))
+  let decryptedData = Decryptor.decryptData(encryptedData, password: pass, error: nil)
+  let decryptedText = (NSString(data: decryptedData, encoding: NSUTF8StringEncoding) as? String)
+  
+  return (string: decryptedText, data: decryptedData)
+}
 ~~~
 
 Now we need to hop back into our Entry.swift file so we can do a bit of refactoring
@@ -536,46 +526,45 @@ setter methods and decrypt data in their getter methods.
 Currently we have this:
 
 ~~~language-swift
-  var title: String {
-    get {
-        return (self.record!.objectForKey("Title") as! String)
-    }
-    set (val) {
-        record.setObject(val, forKey: "Title")
-    }
+var title: String {
+  get {
+      return (self.record!.objectForKey("Title") as! String)
   }
-  
-  var body: String {
-    get {
-        return (self.record!.objectForKey("Body") as! String)
-    }
-    set (val) {
-        record.setObject(val, forKey: "Body")
-    }
+  set (val) {
+      record.setObject(val, forKey: "Title")
   }
+}
 
+var body: String {
+  get {
+      return (self.record!.objectForKey("Body") as! String)
+  }
+  set (val) {
+      record.setObject(val, forKey: "Body")
+  }
+}
 ~~~
 
 Using our encrypt and decrypt methods looks like this: 
 
 ~~~language-swift
-  var title: String? {
-    get {
-      return AuthHelper.decrypt(self.record!.objectForKey("Title") as! String, password: password).string
-    }
-    set (val) {
-      record.setObject(AuthHelper.encrypt(val, password: password).string, forKey: "Title")
-    }
+var title: String? {
+  get {
+    return AuthHelper.decrypt(self.record!.objectForKey("Title") as! String, password: password).string
   }
-  
-  var body: String? {
-    get {
-      return AuthHelper.decrypt(self.record!.objectForKey("Body") as! String, password: password).string
-    }
-    set (val) {
-      record.setObject(AuthHelper.encrypt(val, password: password).string, forKey: "Body")
-    }
+  set (val) {
+    record.setObject(AuthHelper.encrypt(val, password: password).string, forKey: "Title")
   }
+}
+
+var body: String? {
+  get {
+    return AuthHelper.decrypt(self.record!.objectForKey("Body") as! String, password: password).string
+  }
+  set (val) {
+    record.setObject(AuthHelper.encrypt(val, password: password).string, forKey: "Body")
+  }
+}
 ~~~
 
 Notice we've changed our properties to optional String types. This is because
@@ -599,22 +588,22 @@ we should write a create method that takes a completion closure as a parameter.
 In Entry.swift, add a create method to the Entry class with the following code:
 
 ~~~language-swift
-  func create(completion: (success: Bool, message: String, error: NSError?) -> () )
-  {
-    model.privateDB.saveRecord(record) { record, error in
-      dispatch_async(dispatch_get_main_queue()) {
-        if error != nil
-        {
-          completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
-        }
-        else
-        {
-          self.record = record
-          completion(success: true, message: "Your entry was saved successfully!", error: nil)
-        }
+func create(completion: (success: Bool, message: String, error: NSError?) -> () )
+{
+  model.privateDB.saveRecord(record) { record, error in
+    dispatch_async(dispatch_get_main_queue()) {
+      if error != nil
+      {
+        completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
+      }
+      else
+      {
+        self.record = record
+        completion(success: true, message: "Your entry was saved successfully!", error: nil)
       }
     }
   }
+}
 ~~~
 
 As promised, our create method takes a completion closure as the only parameter. 
@@ -641,17 +630,17 @@ handler will allow us to throw success and error messages in the callback. Here'
 saveRecord using our variables:
 
 ~~~language-swift
-  func create(completion: (success: Bool, message: String, error: NSError?) -> () ) {
-    model.privateDB.saveRecord(record, completionHandler: { record, error in
-        if error != nil {
-          completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
-        }
-        else {
-          self.record = record
-          completion(success: true, message: "Your entry was saved successfully!", error: nil)
-        }
-    })
-  }
+func create(completion: (success: Bool, message: String, error: NSError?) -> () ) {
+  model.privateDB.saveRecord(record, completionHandler: { record, error in
+      if error != nil {
+        completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
+      }
+      else {
+        self.record = record
+        completion(success: true, message: "Your entry was saved successfully!", error: nil)
+      }
+  })
+}
 ~~~
 
 If we have an error, our create method's completion closure returns a tuple with 
@@ -678,22 +667,22 @@ Refactor your create method to use the dispatch_async_method which results in th
 following code:
 
 ~~~language-swift
-  func create(completion: (success: Bool, message: String, error: NSError?) -> () )
-  {
-    model.privateDB.saveRecord(record) { record, error in
-      dispatch_async(dispatch_get_main_queue()) {
-        if error != nil
-        {
-          completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
-        }
-        else
-        {
-          self.record = record
-          completion(success: true, message: "Your entry was saved successfully!", error: nil)
-        }
+func create(completion: (success: Bool, message: String, error: NSError?) -> () )
+{
+  model.privateDB.saveRecord(record) { record, error in
+    dispatch_async(dispatch_get_main_queue()) {
+      if error != nil
+      {
+        completion(success: false, message: "Could not save to the cloud. Encrypted and saved locally instead.", error: error)
+      }
+      else
+      {
+        self.record = record
+        completion(success: true, message: "Your entry was saved successfully!", error: nil)
       }
     }
   }
+}
 ~~~
 
 
@@ -702,39 +691,39 @@ In Entry.swift, add a load method to the Entry class with the following code:
 
 ~~~language-swift
 func load(predicate: NSPredicate? = nil, sort: NSSortDescriptor? = nil)
-  {
-    let predicate = predicate ?? NSPredicate(value: true)
-    let sort = sort ?? NSSortDescriptor(key: "creationDate", ascending: false)
-    let query = CKQuery(recordType: "Entry", predicate: predicate)
-    query.sortDescriptors = [sort]
-    
-    model.privateDB.performQuery(query, inZoneWithID: nil) { results, error in
-      if error != nil
-      {
-        dispatch_async(dispatch_get_main_queue()) {
-          self.model.delegate?.errorUpdating(error)
-          println("error loading: \(error)")
-          return
-        }
+{
+  let predicate = predicate ?? NSPredicate(value: true)
+  let sort = sort ?? NSSortDescriptor(key: "creationDate", ascending: false)
+  let query = CKQuery(recordType: "Entry", predicate: predicate)
+  query.sortDescriptors = [sort]
+  
+  model.privateDB.performQuery(query, inZoneWithID: nil) { results, error in
+    if error != nil
+    {
+      dispatch_async(dispatch_get_main_queue()) {
+        self.model.delegate?.errorUpdating(error)
+        println("error loading: \(error)")
+        return
       }
-      else
+    }
+    else
+    {
+      self.records.removeAll(keepCapacity: true)
+      
+      for record in results
       {
-        self.records.removeAll(keepCapacity: true)
-        
-        for record in results
-        {
-          let entry = Entry(record: record as? CKRecord)
-          self.records.append(entry)
-        }
-        
-        dispatch_async(dispatch_get_main_queue()) {
-          self.model.delegate?.modelUpdated()
-          println("successfully loaded entries")
-          return
-        }
+        let entry = Entry(record: record as? CKRecord)
+        self.records.append(entry)
+      }
+      
+      dispatch_async(dispatch_get_main_queue()) {
+        self.model.delegate?.modelUpdated()
+        println("successfully loaded entries")
+        return
       }
     }
   }
+}
 ~~~
 
 {video: flourish_CRUD_load_constants}
@@ -805,16 +794,16 @@ Now that that's set, on to the update method!
 In Entry.swift, add an update method to the Entry class with the following code:
 
 ~~~language-swift
-  func update(title: String? = nil, body: String? = nil, mood: Int? = nil, completion: (success: Bool, message: String, error: NSError?) -> () )
-  {
-    self.title = title ?? self.title
-    self.body = body ?? self.body
-    self.mood = mood ?? self.mood
-    
-    create() { success, message, error in
-      completion(success: success, message: message, error: error)
-    }
+func update(title: String? = nil, body: String? = nil, mood: Int? = nil, completion: (success: Bool, message: String, error: NSError?) -> () )
+{
+  self.title = title ?? self.title
+  self.body = body ?? self.body
+  self.mood = mood ?? self.mood
+  
+  create() { success, message, error in
+    completion(success: success, message: message, error: error)
   }
+}
 ~~~
 
 
@@ -833,20 +822,20 @@ In Entry.swift, add a destroy method to the Entry class with the following code:
 
 ~~~language-swift
 func destroy(completion: (success: Bool, message: String, error: NSError?) -> () )
-  {
-    model.privateDB.deleteRecordWithID(record.recordID) { record, error in
-      if error != nil
-      {
-        println("ERR RECORD ID: \(self.record.recordID)")
-        completion(success: false, message: "could not delete entry", error: error)
-      }
-      else
-      {
-        println("DEL RECORD ID: \(self.record.recordID)")
-        completion(success: true, message: "successfully deleted entry", error: nil)
-      }
+{
+  model.privateDB.deleteRecordWithID(record.recordID) { record, error in
+    if error != nil
+    {
+      println("ERR RECORD ID: \(self.record.recordID)")
+      completion(success: false, message: "could not delete entry", error: error)
+    }
+    else
+    {
+      println("DEL RECORD ID: \(self.record.recordID)")
+      completion(success: true, message: "successfully deleted entry", error: nil)
     }
   }
+}
 ~~~
 
 Destroy takes completion block and, as with our other create and load, we call
