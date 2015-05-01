@@ -44,7 +44,7 @@ Let's do some setup.
 Open Xcode and select "create new Xcode project" 
 
 {x: project_setup}
-Select single page app and set the language to Swift. Set the device to iPhone 
+Select tabbed application and set the language to Swift. Set the device to iPhone 
 and let's name this project "Flourish-Teaching" to distinguish from the source 
 code, which is called "Flourish."
 
