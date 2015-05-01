@@ -376,7 +376,7 @@ Create a library folder by going to file > new > group and calling this folder
 "Library". This folder stores any external libraries in our project. 
 
 {x: download_crypto_library}
-Download our Encryptor library from here: ****link ***** This is basically the 
+Download our Encryptor library from [here](https://github.com/thinkclay/crypto) This is basically the 
 great RNCryptor library found [here](https://github.com/RNCryptor/RNCryptor) with
 some tweaks to work with Swift. 
 
