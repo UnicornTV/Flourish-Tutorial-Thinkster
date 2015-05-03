@@ -85,10 +85,3 @@ Open up your app in the simulator and fill out the form. Hit the save entry butt
 
 If you got the success message...YOU ARE AMAZING. If you got an error message, 
 try to debug it until you get success. 
-
-Now we've reached the first checkpoint. We will be releasing many more additions 
-to this tutorial over time, but you've already done so much. You've designed an 
-app using the MVC model that has multiple views, cool animations, and even syncs
-with iCloud! You've also written custom classes, made asyncronous requests, and 
-worked with the Core Location API. We're barely at the tip of the iceberg! 
-
