@@ -340,8 +340,8 @@ func modelUpdated() {
 }
 ~~~
 
-If you build and run at this point, you'll see all of CKRecord objects we retrieve
-in our Entry class' load() method when you tab over to the Journal view. 
+If you build and run at this point, you'll see a log message of CKRecord objects
+we retrieve in our Entry class' load() method when you tab over to the Journal view. 
 
 {x: save_and_retrieve}
 Save some entries and make sure you get some entries logged. You should see a log
@@ -351,6 +351,22 @@ message that looks like the the following:
 
 ## Getting our entries 
 
+Now that we have gotten some data, let's populate the table cells in our UITableView
+with that data. In order to populate our cells with our data, we need to implement 
+two delegate methods. One tells the app how many rows we need in our table and 
+the other tells the app what data to put in the table cell. It is important to 
+note now that anytime we use the UITableViewController class, we automatically 
+conform to the UITableViewDelegate and UITableVIewDataSource protocols. 
 
+{x: row_and_data_methods}
+Set the number of table rows to the number of entries we have by adding the following
+code to our JournalController class:
+
+~~~language-swift
+override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+{
+    return entries.records.count
+}
+~~~
 
 
