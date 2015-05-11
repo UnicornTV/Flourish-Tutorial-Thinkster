@@ -358,7 +358,7 @@ the other tells the app what data to put in the table cell. It is important to
 note now that anytime we use the UITableViewController class, we automatically 
 conform to the UITableViewDelegate and UITableVIewDataSource protocols. 
 
-{x: row_and_data_methods}
+{x: table_rows}
 Set the number of table rows to the number of entries we have by adding the following
 code to our JournalController class:
 
@@ -368,5 +368,74 @@ override func tableView(tableView: UITableView, numberOfRowsInSection section: I
     return entries.records.count
 }
 ~~~
+
+The tableView:numberOfRowsInSection method takes two parameters: the table view
+we're referring to, and an index number identifying a section in the tableView. 
+The method must return an integer. We return the length of our entries array to 
+have only as many table rows as entries. 
+
+Now that we've implemented our nuberOfRowsInSection, we are only missing a data
+source. There are two ways to do this: the fast, simple way with default styles 
+and the more involved way with custom styles. Want to venture a guess as to which
+one we are going to implement? If you guessed "custom", you get a PRIZE! 
+
+Our table view data source must return a cell from the method tableView:cellForRowAtIndexPath
+method. The cell is of type UITableViewCell, so we can subclass the UITableViewCell
+class to create a custom cell. 
+
+{x: custom_cell_file}
+Create a new swift file for your custom cell class. Go to file > new > file and select 
+"swift file." Name the file JournalEntryCell.swift.
+
+{x; journal_cell_class_delcaration}
+In JournalEntryCell.swift, add the class declaration for the new journal class
+with the following code:
+
+~~~language-swift
+import UIKit
+
+class JournalEntryCell: UITableViewCell
+{
+    var entry: Entry? {
+        didSet {
+            updateUI()
+        }
+    }
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var bodyLabel: UILabel!
+    
+    func updateUI()
+    {
+        // Reset properties
+        titleLabel?.text = nil
+        bodyLabel?.text = nil
+        
+        if let entry = self.entry
+        {
+            titleLabel?.text = entry.title
+            bodyLabel?.text = entry.body
+            
+            titleLabel?.sizeToFit()
+            bodyLabel?.sizeToFit()
+        }
+    }
+}
+~~~
+
+The variable declaration in the first line declares a variable entry, which is
+of optional type Entry. The next line we use a method we haven't used before: didSet. 
+The didSet method is a property observer, which observe and respond to changes in 
+a property's value. didSet is called immediately after the new value is stored. 
+
+- add class code
+- add data source method in journalEntryController
+- declare identifier in storyboard 
+- set table cell to custom class 
+- set IBOutlet methods 
+- profit 
+
+{x: table_data_source}
+
 
 
