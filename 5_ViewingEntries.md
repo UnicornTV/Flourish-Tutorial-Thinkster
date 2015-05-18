@@ -415,9 +415,6 @@ class JournalEntryCell: UITableViewCell
         {
             titleLabel?.text = entry.title
             bodyLabel?.text = entry.body
-            
-            titleLabel?.sizeToFit()
-            bodyLabel?.sizeToFit()
         }
     }
 }
@@ -425,17 +422,124 @@ class JournalEntryCell: UITableViewCell
 
 The variable declaration in the first line declares a variable entry, which is
 of optional type Entry. The next line we use a method we haven't used before: didSet. 
-The didSet method is a property observer, which observe and respond to changes in 
-a property's value. didSet is called immediately after the new value is stored. 
+The didSet method is a property observer. Property observers observe and respond to changes in a property's value. didSet is called immediately after the new value is stored. So whenever a value for our entry variable is set, we call an updateUI 
+method that reloads the table cell with the latest data. An astute person reading 
+a draft of this chapter asked: "Where in the world are you assigning any values 
+to the entry variable?" That's a question I'm sure many of you will have. To
+answer, recall we implemented a singleton pattern in writing our Entry class. That
+means each time we call an instance of the Entry class, we are calling the same 
+exact instance. So whenever any variable of type Entry sets values for any of its
+properties, we setting values for our entry variable. Therefore, when we update
+the entries variable of JournalController, which is of type Entry, we are going
+to be calling the didSet property observer of the entry variable in JournalEntryCell.
+If you're still confused, add a some log messages to see when things are getting
+called and set. This stuff can get really confusing. 
 
-- add class code
-- add data source method in journalEntryController
-- declare identifier in storyboard 
-- set table cell to custom class 
-- set IBOutlet methods 
-- profit 
+The block of code contains two IBOutlet declarations: one for the title of our
+entry and one for the body of our entry. That's all we're going to display in 
+our table cell. 
+
+Lastly, we need to write our updateUI() function. This function sets our IBOutlet
+variables to nil before reassigning those variables to values in our entry variable.
+Notice the familiar use of if let to check if our optional entry variable has 
+a value. If it does have a value, we update the text property of our IBOutlet
+variables to match the title and body properties of our entry variable. 
+
+{x: cell_custom_class}
+In main.storyboard, select the table cell inside the table view of your journal 
+controller. In its identity inspector's custom class section, change the class
+to JournalEntryCell. 
+
+TableViews render by establishing a prototype cell with certain properties and 
+repeating that cell as many times as specified by the code. Each repetition allows
+us to set new values for those properties in the prototype cell. What we've just
+done is set the prototype cell (and therefore all of our cells) as being
+of class JournalEntryCell.  
 
 {x: table_data_source}
+Hop back to JournalController.swift and implement the tableView(cellForRowAtIndexPath) method of the UITableViewDataSource protocol by adding the following code:
+
+~~~language-swift
+ override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
+  {
+    let cell : JournalEntryCell = tableView.dequeueReusableCellWithIdentifier(Properties.entryCellIdentifier) as! JournalEntryCell
+    
+    cell.entry = entries.records[indexPath.row]
+
+    return cell
+  }
+~~~
+
+In order to understand the tableView(cellForRowAtIndexPath) method, we need to
+start with the last line: return cell. This method returns a table cell. The 
+rest of the code in our method tells the method which cell we are returning. Our
+parameters are a tableView to which the cell we return will belong to and a
+cellForRowAtIndexPath, which is of type NSIndexPath. The NSIndexPath is hard to 
+understand and it is rarely used so for our purposes think of it this way: NSIndexPath is a vector for referencing arrays within arrays. It's kind of like a 
+coordinate system. In our method this indexPath determines which row and section
+the cell is returned for. 
+
+Inside our method our first line declares a constant called cell of type 
+JournalEntryCell. On the right side of the declaration, we use the dequeResuableCellWithIndentifier method of UITableView, which returns a UITableViewCell, and cast the return cell as a JournalEntryCell. dequeueReusableCellWithIdentifier returns a reusable table-view object that we
+locate by its identifier. A table view keeps a queue of of UITableViewCell cells
+for reuse. What we are doing is removing any cells that are currently queued up 
+from the queue and replacing it with a new one using a class or nib file. 
+
+Next we set the entry property of our cell constant to the specific CKRecord 
+object in our indexPath row. If you've never seen the object lookup notation, you
+can look up an object value inside an array of objects using this syntax: arrayName[key]. 
+
+Finally we end up where we started our explanation: returning the cell. 
+
+{x: add_titleLabel_to_cell}
+In main.storyboard, drag two UILabel object from the object library into the
+prototype cell. 
+
+{x: link_iboutlets_prototype}
+Using the assistant editor to open Main.storyboard and JournalEntryCell.swift
+side by side, ctrl-click and drag from each label in the prototype cell to link
+to each of the IBOutlet variables in JournalCellController.swift. The top label
+should be linked to the titleLabel variable and the lower label should be linked
+to the bodyLabel variable. 
+
+{x: build_and_run_table}
+Build and run. When you tab over to the journal view, you should see all of your
+saved entries in a table. It's not pretty but it's there. 
+
+*** pic ***
+
+Now let's do some storyboard work to get our table cells to look better. 
+
+{x: auto_layout_title_label}
+In main.storyboard, select the titleLabel label and apply a Leading Space (via
+the pin menu or the drag method) and Trailing space constraint of 20. Then set a
+Top Space constraint to 10. Those three constraints should be relative to the superview. Go ahead and set a height constraint of 100 as well. 
+
+{x: auto_layout_body_label}
+In main.storyboard, select the titleLabel label and apply a Leading Space (via
+the pin menu or the drag method) and Trailing space constraint of 20. Then set a
+Bottom Space constraint to 10. Those three constraints should be relative to the superview. 
+
+{x: title_body_constraint}
+Control-drag from the titleLabel to the bodyLabel and apply vertical spacing 
+constraint. In the title label's size inspector, edit the bottom space to 
+label constraint to equal 0. 
+
+Here's what we'll have at this point: 
+
+*** title body constraints ***
+
+*** pic of constraint ***
+
+-style cells
+- auto layout
+- font
+- images
+
+
+
+**hat tip to this stack overflow question http://stackoverflow.com/questions/8079471/how-does-cellforrowatindexpath-work upvote if you can***
+
 
 
 
