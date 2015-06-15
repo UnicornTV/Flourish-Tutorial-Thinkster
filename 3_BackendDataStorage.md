@@ -68,7 +68,7 @@ To begin creating a data model, log into your [cloud kit developer dashboard](ht
 or click the "cloudkit dashboard" button in the iCloud pane of the Capabilities 
 menu. 
 
-Once you log in you'll notice a three-pane layout. The name of the iCLoud container
+Once you log in you'll notice a three-pane layout. The name of the iCloud container
 you are currently viewing is in the upper left corner. 
 
 {x: correct_container}
