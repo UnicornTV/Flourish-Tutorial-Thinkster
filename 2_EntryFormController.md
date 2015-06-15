@@ -315,7 +315,7 @@ statement but before view.addSubview(picker) add the following:
 ~~~language-swift
 var offset = 21
 
-for (index, feeling) in enumerate(AppHelper.properties.moods)
+for (index, feeling) in enumerate(AppHelper.properties.feelings)
   {
     let button = UIButton()
     button.frame = CGRect(x: 13, y: offset, width: 260, height: 43)
