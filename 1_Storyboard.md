@@ -328,7 +328,7 @@ add an image view object to our view.
 
 {x: add_icon}
 Drag an image view from the object library and drop it onto your entry view. Set a
-height constraint of 13 points and a width constraint of 18 points in the pin menu. 
+height constraint of 18 points and a width constraint of 13 points in the pin menu. 
 
 {x: add_background_image}
 Change image property of our new image view to the pencil icon, which can be 
