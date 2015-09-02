@@ -175,7 +175,7 @@ property set to true by default. However, when we initialize a new UIImageView
 object in code, the userInteractionEnabled property is set to false by default. We actually
 could have drawn the picker in our Main.storyboard file using interface builder and 
 set our properties attributes inspector. The reason we did not draw our dropdown
-in the interface builder is because we are going to be problematically creating 
+in the interface builder is because we are going to be programatically creating 
 what's called <i>subviews</i> of the button.
 
 {video: flourish_subview_superview}
@@ -315,7 +315,7 @@ statement but before view.addSubview(picker) add the following:
 ~~~language-swift
 var offset = 21
 
-for (index, feeling) in enumerate(AppHelper.properties.feelings)
+for (index, feeling) in enumerate(feelings)
   {
     let button = UIButton()
     button.frame = CGRect(x: 13, y: offset, width: 260, height: 43)
@@ -381,6 +381,9 @@ func openPicker()
         self.picker.alpha = 1
       },
       completion: { finished in
+        if (finished) {
+            self.picker.hidden = false
+        }
       }
     )
   }
